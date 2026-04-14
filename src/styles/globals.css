@@ -1,0 +1,561 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background: linear-gradient(
+    -45deg,
+    var(--gradient-color-1, #4338ca),
+    var(--gradient-color-2, #7e22ce),
+    var(--gradient-color-3, #ec4899),
+    var(--gradient-color-4, #3b82f6),
+    var(--gradient-color-5, #10b981),
+    var(--gradient-color-6, #f59e0b)
+  );
+  background-size: 400% 400%;
+  animation: gradientAnimation 30s cubic-bezier(0.445, 0.05, 0.55, 0.95)
+    infinite;
+  will-change: background-position;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.1 83.2% 9.8%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --ring: 222.1 83.2% 9.8%;
+
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.1 83.2% 9.8%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Add these custom styles for chat messages */
+@layer components {
+  .chat-message {
+    @apply break-words overflow-hidden whitespace-pre-wrap text-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+/* @layer base {
+  :root {
+    --background: 0 0% 100%;
+
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+
+    --input: 240 5.9% 90%;
+
+    --ring: 240 10% 3.9%;
+
+    --chart-1: 12 76% 61%;
+
+    --chart-2: 173 58% 39%;
+
+    --chart-3: 197 37% 24%;
+
+    --chart-4: 43 74% 66%;
+
+    --chart-5: 27 87% 67%;
+
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 240 10% 3.9%;
+
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+
+    --input: 240 3.7% 15.9%;
+
+    --ring: 240 4.9% 83.9%;
+
+    --chart-1: 220 70% 50%;
+
+    --chart-2: 160 60% 45%;
+
+    --chart-3: 30 80% 55%;
+
+    --chart-4: 280 65% 60%;
+
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */
+
+/* Add markdown styles at the end of the file */
+
+/* Markdown styling for chat messages */
+.markdown-content {
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  font-weight: 700;
+  margin-top: 1.2rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.3;
+}
+
+.markdown-content h1 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid rgba(125, 125, 125, 0.2);
+  padding-bottom: 0.3rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.3rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* First header in content gets special styling */
+.markdown-content h3:first-of-type {
+  margin-top: 0.25rem;
+  font-size: 1.25rem;
+  color: hsl(var(--primary));
+}
+
+.markdown-content p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding-left: 1.75rem;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+/* Compact markdown styles - completely new approach */
+.compact-markdown {
+  line-height: 1.4 !important;
+}
+
+.compact-markdown p {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.compact-markdown h1,
+.compact-markdown h2,
+.compact-markdown h3 {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Compact numbered lists */
+.compact-markdown ol {
+  list-style: none !important;
+  counter-reset: item !important;
+  padding-left: 0 !important;
+  margin: 0.25rem 0 !important;
+}
+
+.compact-markdown ol > li {
+  counter-increment: item;
+  position: relative !important;
+  padding-left: 1.25rem !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.3 !important;
+}
+
+.compact-markdown ol > li::before {
+  content: counter(item) "." !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  font-weight: 600 !important;
+}
+
+/* Compact SMART goal formatting */
+.compact-markdown ol > li > p {
+  margin: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+.compact-markdown ol > li > p > strong:first-child {
+  color: hsl(var(--primary));
+  font-weight: 600 !important;
+  margin-right: 0.25rem !important;
+  min-width: auto !important;
+}
+
+/* Compact bullet lists */
+.compact-markdown ul {
+  list-style-type: disc !important;
+  padding-left: 1.25rem !important;
+  margin: 0.25rem 0 !important;
+}
+
+.compact-markdown ul > li {
+  margin-bottom: 0.25rem !important;
+  line-height: 1.3 !important;
+}
+
+/* Compact nested lists */
+.compact-markdown ul ul,
+.compact-markdown ol ol,
+.compact-markdown ul ol,
+.compact-markdown ol ul {
+  margin: 0.125rem 0 !important;
+  padding-left: 1rem !important;
+}
+
+/* Compact obstacle-solution pairs */
+.compact-markdown p > strong:first-child {
+  display: inline-block !important;
+  margin-right: 0.25rem !important;
+}
+
+/* Original markdown styles below */
+.markdown-content ol {
+  list-style: none !important;
+  counter-reset: smart-goal !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.markdown-content ol > li {
+  counter-increment: smart-goal;
+  position: relative;
+  padding-left: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.markdown-content ol > li::before {
+  content: counter(smart-goal) "." !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  font-weight: 600 !important;
+}
+
+/* Fix for SMART goal labels and content alignment */
+.markdown-content ol > li > p {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  margin: 0 !important;
+}
+
+.markdown-content ol > li > p > strong:first-child {
+  color: hsl(var(--primary));
+  font-weight: 700;
+  margin-right: 0.5rem !important;
+  min-width: 5rem !important;
+  display: inline-block !important;
+}
+
+/* Add space between label and content */
+.markdown-content ol > li > p > strong:first-child::after {
+  content: ":" !important;
+  display: inline !important;
+}
+
+/* Improve spacing between list items with nested content */
+.markdown-content li p {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Improve nested lists */
+.markdown-content li > ul,
+.markdown-content li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Improve indentation in nested content */
+.markdown-content ul ul,
+.markdown-content ol ol,
+.markdown-content ul ol,
+.markdown-content ol ul {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  padding-left: 1.5rem;
+}
+
+/* Better styling for bullet points */
+.markdown-content ul > li {
+  position: relative;
+  padding-left: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Styling for actionable steps and obstacles sections */
+.markdown-content h3 + ul {
+  margin-top: 0.75rem;
+}
+
+/* Better styling for nested bullets under obstacles */
+.markdown-content ul > li > ul > li {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+/* Format the labels within nested lists */
+.markdown-content ul > li > ul > li > strong:first-child {
+  color: hsl(var(--primary));
+  opacity: 0.9;
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+
+/* Improve spacing for obstacle-solution pairs */
+.markdown-content ul > li > strong:first-child {
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+/* Fix for Obstacle and Solution formatting */
+.markdown-content p > strong:first-child {
+  display: inline-block !important;
+  margin-right: 0.5rem !important;
+}
+
+.markdown-content strong {
+  font-weight: 700;
+}
+
+.markdown-content em {
+  font-style: italic;
+}
+
+.markdown-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.9em;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid currentColor;
+  padding-left: 0.75rem;
+  font-style: italic;
+  margin: 0.75rem 0;
+  opacity: 0.8;
+}
+
+/* Improve spacing after each section */
+.markdown-content h3 + p,
+.markdown-content h3 + ul,
+.markdown-content h3 + ol {
+  margin-top: 0.25rem;
+}
+
+/* Add space after headers */
+.markdown-content h3 + * {
+  margin-top: 0.5rem;
+}
+
+/* Additional margin for the final section */
+.markdown-content p:last-child {
+  margin-bottom: 0.5rem;
+}
+
+/* Special handling for dark mode */
+[data-theme="dark"] .markdown-content code,
+[data-theme="dark"] .markdown-content pre {
+  background-color: rgba(255, 255, 255, 0.1);
+}

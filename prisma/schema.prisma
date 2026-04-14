@@ -1,0 +1,179 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mongodb"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id              String               @id @map("_id") // Changed from ObjectId to String
+  email           String?              
+  name            String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  userProfile     UserProfile?
+  sessions        Session[]
+  botPreferences  BotPreferences?
+  who5Assessments WHO5Assessment[]
+  goalFeedbacks   GoalFeedback[] // Add this line to establish the relation
+  googleCalendar  GoogleCalendarToken? // Add relation to GoogleCalendarToken
+
+  @@map("users")
+}
+
+model Session {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime  @default(now())
+  userId       String // Changed from ObjectId to String
+  currentPhase String?   @default("introduction") // Store the current chat phase
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@map("sessions")
+}
+
+model Message {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime @default(now())
+  role         String
+  content      String
+  sessionId    String   @db.ObjectId
+  messageIndex Int      @default(0) //to track message order
+  session      Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, messageIndex]) 
+  @@map("messages")
+}
+
+model UserProfile {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique // Changed from ObjectId to String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Demographic information
+  age         Int?
+  gender      String?
+  collegeYear String?
+  major       String?
+
+  // Personality traits
+  openMindedness    Float?
+  conscientiousness Float?
+  extraversion      Float?
+  agreeableness     Float?
+  neuroticism       Float?
+
+  // Mental health attributes
+  emotionalAwareness String? // high, moderate, low - how aware they are of their emotions
+  copingStrategies   String? // healthy, mixed, avoidant - how they typically handle stress
+  motivationType     String? // direct praise, progress, achievement, effort
+
+  // Challenges and goals
+  challenges Json?
+  goals      Json? @default("{\"mental_health_goals\": []}") // Default to empty array of goals
+
+  // Communication preferences (inferred)
+  commStyle Json?
+
+  // Feedback on coaching
+  feedback Json?
+
+  //bevs
+  bevs      Json?
+
+  // UI preferences
+  hideWelcomeDialog Boolean? @default(false)
+  emailFrequency    String?  @default("daily") 
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_profiles")
+  calendarPreferredWindow String? // "morning" | "afternoon" | "evening" | "night"
+  timeZone                String?
+  currentPhase String @default("introduction") 
+}
+
+model BotPreferences {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  botName       String   @default("Taylor")
+  botImageUrl   String?
+  botGender     String   @default("Female")
+  hasCustomized Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("bot_preferences")
+}
+
+model WHO5Assessment {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String // Foreign key to User
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // The 5 questions of the WHO-5 Well-being Index (1-5 scale for each)
+  question1 Int // "I have felt cheerful and in good spirits"
+  question2 Int // "I have felt calm and relaxed"
+  question3 Int // "I have felt active and vigorous"
+  question4 Int // "Woke up feeling fresh and rested"
+  question5 Int // "My daily life has been filled with things that interest me"
+
+  // Total score (0-100, calculated as sum of the five questions multiplied by 4)
+  totalScore Int
+
+  // Interpretation could be a string like "poor", "low", "moderate", "high" based on the score
+  interpretation String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  sessionId String? // Optional: link to the session when the assessment was taken
+
+  @@map("who5_assessments")
+}
+
+// Add the new GoalFeedback model
+model GoalFeedback {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String // Foreign key to User
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Goal description or identifier
+  goalDescription String
+
+  // Rating from 1 to 5 representing how helpful the chatbot was
+  helpfulnessRating Int
+
+  // Optional user-provided feedback
+  comment String?
+
+  // Optional emotional state after completing the goal
+  emotionalState String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  sessionId String?  @db.ObjectId // Optional: link to the session when the feedback was given
+
+  @@map("goal_feedbacks")
+}
+
+// Google Calendar Token model
+model GoogleCalendarToken {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("google_calendar_tokens")
+}
