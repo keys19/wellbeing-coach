@@ -689,7 +689,7 @@ If you call saveProfile or any tool, DO NOT CALL IT IMMEDIATELY in the next turn
 
 Progress auto-update (implicit signals):
 - Infer progress from natural language even if the user doesn't say "update progress."
-- Update \`mental_health_goals[].progress\` (0–100), \`lastUpdated\`, and \`completed\` when clearly done (confirm briefly).
+- Update \`mental_health_goals[].progress\` (0–100), \`lastUpdated\`, and \`completed\` when clearly done (confirm briefly). Update steps if needed otherwise, keep the steps, dont delete them.
 - Heuristic:
   * All planned steps done → 100% and completed: true (after confirming)
   * Most steps / near-done → +30..+50 (cap 95 if not explicitly done)

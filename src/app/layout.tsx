@@ -27,46 +27,14 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider 
-  afterSignInUrl="/app/dashboard"
-  afterSignUpUrl="/app/dashboard"
-  >
+      afterSignInUrl="/app/dashboard"
+      afterSignUpUrl="/app/dashboard"
+    >
       <html lang="en">
-        <head>
-          <script
-  dangerouslySetInnerHTML={{
-    __html: `
-      /* Ensure there's always welcome message cached */
-      try {
-        const cachedMessages = localStorage.getItem("cached_chat_messages");
-        if (!cachedMessages || cachedMessages === "[]") {
-          const welcomeMessage = [
-            {
-              id: "init",
-              role: "system",
-              content: "Start"
-            },
-            {
-              id: "welcome-" + Date.now(),
-              role: "assistant",
-              content: "Hello there! I'm your mental health coach. How are you feeling today? I'm here to help you with productivity techniques and emotional support."
-            }
-          ];
-          localStorage.setItem("cached_chat_messages", JSON.stringify(welcomeMessage));
-          console.log("Added default welcome message to localStorage");
-        }
-      } catch (e) {
-        console.error("Error setting default message:", e);
-      }
-    `,
-  }}
-/>
-
-        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
-          
         </body>
       </html>
     </ClerkProvider>

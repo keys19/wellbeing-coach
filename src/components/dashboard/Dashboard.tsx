@@ -2616,7 +2616,7 @@ const addToCalendar = async (goalIndex: number, preferredWindow: "morning"|"afte
 
 
       {/* Floating Help Button (fixed to viewport) */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setOpenHelp(true)}
           className="h-12 w-12 rounded-full p-0 shadow-lg
@@ -2626,7 +2626,7 @@ const addToCalendar = async (goalIndex: number, preferredWindow: "morning"|"afte
         >
           <CircleHelp className="h-5 w-5" />
         </Button>
-      </div>
+      </div> */}
 
       {/* Help Dialog (same UI as WelcomeDialog sibling) */}
       <GettingStartedDialog

@@ -825,49 +825,92 @@ export default function ChatPage() {
   const [completedGoalDescription, setCompletedGoalDescription] =
     useState<string>("");
 
-  const [initialState] = useState(() => {
-    try {
-      if (typeof window !== "undefined") {
-        const cachedSessionId = localStorage.getItem(STORAGE_KEY_SESSION);
-        const cachedMessages = localStorage.getItem(STORAGE_KEY_MESSAGES);
-        const cachedPhase = localStorage.getItem(STORAGE_KEY_PHASE);
+  // const [initialState] = useState(() => {
+  //   try {
+  //     if (typeof window !== "undefined") {
+  //       const cachedSessionId = localStorage.getItem(STORAGE_KEY_SESSION);
+  //       const cachedMessages = localStorage.getItem(STORAGE_KEY_MESSAGES);
+  //       const cachedPhase = localStorage.getItem(STORAGE_KEY_PHASE);
 
-        if (cachedSessionId && cachedMessages) {
-          const parsedMessages = JSON.parse(cachedMessages) as ChatMessage[];
+  //       if (cachedSessionId && cachedMessages) {
+  //         const parsedMessages = JSON.parse(cachedMessages) as ChatMessage[];
           
-          if (cachedPhase) {
-            setCurrentPhase(cachedPhase);
-          }
+  //         if (cachedPhase) {
+  //           setCurrentPhase(cachedPhase);
+  //         }
 
-          try {
-            const li = localStorage.getItem(STORAGE_KEY_LAST_INDEX);
-            if (li) lastSyncedIndexRef.current = parseInt(li, 10);
-          } catch {}
+  //         try {
+  //           const li = localStorage.getItem(STORAGE_KEY_LAST_INDEX);
+  //           if (li) lastSyncedIndexRef.current = parseInt(li, 10);
+  //         } catch {}
 
-          return {
-            messages: parsedMessages,
-            sessionId: cachedSessionId,
-          };
-        }
+  //         return {
+  //           messages: parsedMessages,
+  //           sessionId: cachedSessionId,
+  //         };
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error pre-loading cached state:", error);
+  //   }
+
+  //   // If no cached messages, create initial welcome message
+  //   const welcomeMessage: ChatMessage = {
+  //     id: `welcome-${Date.now()}`,
+  //     role: "assistant",
+  //     content: `Hello there! I'm your wellbeing coach. How are you feeling today? I'm here to offer you emotional support and help you achieve your goals. I will be asking you a few questions to get to know you better - these are just a one time thing!`,
+  //     messageIndex: 0,
+  //     createdAt: new Date().toISOString(),
+  //   };
+
+  //   return {
+  //     messages: [welcomeMessage],
+  //     sessionId: null,
+  //   };
+  // });
+
+const [messages, setMessages] = useState<ChatMessage[]>([]);
+const [sessionId, setSessionId] = useState<string | null>(null);
+
+useEffect(() => {
+  try {
+    const cachedSessionId = localStorage.getItem(STORAGE_KEY_SESSION);
+    const cachedMessages = localStorage.getItem(STORAGE_KEY_MESSAGES);
+    const cachedPhase = localStorage.getItem(STORAGE_KEY_PHASE);
+
+    if (cachedSessionId && cachedMessages) {
+      const parsedMessages = JSON.parse(cachedMessages) as ChatMessage[];
+
+      setSessionId(cachedSessionId);
+      setMessages(parsedMessages);
+
+      if (cachedPhase) {
+        setCurrentPhase(cachedPhase);
       }
-    } catch (error) {
-      console.error("Error pre-loading cached state:", error);
+
+      try {
+        const li = localStorage.getItem(STORAGE_KEY_LAST_INDEX);
+        if (li) lastSyncedIndexRef.current = parseInt(li, 10);
+      } catch {}
+      
+      return;
     }
+  } catch (error) {
+    console.error("Error loading cached state:", error);
+  }
 
-    // If no cached messages, create initial welcome message
-    const welcomeMessage: ChatMessage = {
-      id: `welcome-${Date.now()}`,
-      role: "assistant",
-      content: `Hello there! I'm your wellbeing coach. How are you feeling today? I'm here to offer you emotional support and help you achieve your goals. I will be asking you a few questions to get to know you better - these are just a one time thing!`,
-      messageIndex: 0,
-      createdAt: new Date().toISOString(),
-    };
+  // fallback welcome message
+  const welcomeMessage: ChatMessage = {
+    id: `welcome-${Date.now()}`,
+    role: "assistant",
+    content: `Hello there! I'm your wellbeing coach. How are you feeling today? I'm here to offer you emotional support and help you achieve your goals. I will be asking you a few questions to get to know you better - these are just a one time thing!`,
+    messageIndex: 0,
+    createdAt: new Date().toISOString(),
+  };
 
-    return {
-      messages: [welcomeMessage],
-      sessionId: null,
-    };
-  });
+  setMessages([welcomeMessage]);
+  setSessionId(null);
+}, []);
 
   const compareMessages = (a: ChatMessage, b: ChatMessage) => {
     const ai = Number.isFinite(a.messageIndex as any) ? (a.messageIndex as number) : undefined;
@@ -885,9 +928,10 @@ export default function ChatPage() {
   };
 
   // Get initial state for messages
-  const [messages, setMessages] = useState<ChatMessage[]>(
-    initialState.messages
-  );
+  // const [messages, setMessages] = useState<ChatMessage[]>(
+  //   initialState.messages
+  // );
+
   // Always-upto-date reference to messages for unmount/route-change flushes
   const latestMessagesRef = useRef<ChatMessage[]>([]);
   useEffect(() => {
@@ -1013,6 +1057,7 @@ const computeDelta = (withIndex: ChatMessage[]) => {
 const debouncedSyncMessages = useMemo(() => {
   return debounce(
     async (messagesToSync: ChatMessage[], retryCount = 0): Promise<void> => {
+      if (isStreamingRef.current) return;
       const session = currentSessionRef.current;
       if (!session || !user || !isOnlineRef.current) {
         setSyncStatus((p) => ({ ...p, pendingChanges: true }));
@@ -1541,8 +1586,10 @@ async function loadSessionMessages(sessionId: string) {
   let didLoadFromServer = false;
 
   try {
-    const messagesResponse = await fetch(`/api/sessions/${sessionId}/messages`);
-    const sessionResponse = await fetch(`/api/sessions/${sessionId}`);
+    const [messagesResponse, sessionResponse] = await Promise.all([
+  fetch(`/api/sessions/${sessionId}/messages`),
+  fetch(`/api/sessions/${sessionId}`)
+]);
 
     if (messagesResponse.ok) {
       const messagesData = await messagesResponse.json();
@@ -1586,7 +1633,13 @@ try { localStorage.setItem(STORAGE_KEY_LAST_INDEX, String(maxIdx)); } catch {}
 
         const newMessages: ChatMessage[] = [...formatted];
 
-        setMessages(newMessages);
+        setMessages(prev => {
+        const userMessages = prev.filter(m => m.role === "user");
+        if (userMessages.length > 0) {
+          return prev;
+        }
+        return newMessages;
+      });
         rawBufferRef.current = newMessages;
         setIsLoadingMessages(false);
         didLoadFromServer = true;
@@ -2748,6 +2801,33 @@ const handleSubmit = async (e: React.FormEvent) => {
   rawBufferRef.current.push(userMessage);
   setTimeout(() => saveToLocalStorageImmediate(), 0);
 
+  if (currentSession?.id && !currentSession.id.startsWith("temp-") && user) {
+  const allMsgs = withStableIndexes(
+    stripEmptyAssistant([...messages, userMessage].filter(m => m.role !== "system"))
+  );
+  const toSync = allMsgs.filter(m =>
+    typeof m.messageIndex === "number" &&
+    (m.messageIndex as number) > lastSyncedIndexRef.current
+  );
+  if (toSync.length > 0) {
+    fetch(`/api/sessions/${currentSession.id}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: toSync, currentPhase }),
+      credentials: "same-origin",
+    }).then(async (res) => {
+      if (res.ok) {
+        lastSyncedIndexRef.current = userMessage.messageIndex as number;
+        try {
+          localStorage.setItem(STORAGE_KEY_LAST_INDEX, String(userMessage.messageIndex));
+        } catch {}
+      }
+    }).catch(e => console.warn("[UserMsgSync] failed", e));
+  }
+}
+
+
+
   let assistantMessageId: string | null = null;
   let assistantText = "";
 
@@ -2927,16 +3007,13 @@ const handleSubmit = async (e: React.FormEvent) => {
     setMessages((prev) => [...prev, errorMessage]);
     rawBufferRef.current.push(errorMessage);
     setTimeout(() => saveToLocalStorageImmediate(), 0);
-  } finally {
-    isStreamingRef.current = false; // ADD THIS LINE
+  }  finally {
+    isStreamingRef.current = false;
     setIsLoading(false);
     
-    // Force sync after streaming is completely done
-    if (assistantMessageId) {
-      setTimeout(async () => {
-        await forceSyncMessages();
-      }, 2000);
-    }
+    setTimeout(async () => {
+      await forceSyncMessages();
+    }, 3000);
   }
 };
 
@@ -3087,18 +3164,18 @@ Let's talk about what you'd like to work on next.`,
   }, [isLoaded, user, isMounted]);
 
   //added useEffect to sync messages when currentSession changes
-  useEffect(() => {
+useEffect(() => {
   if (
     currentSession &&
     !currentSession.id.startsWith("temp-") &&
-    rawBufferRef.current.length > 0
+    rawBufferRef.current.length > 0 &&
+    newlyCreatedRef.current  // ADD THIS CHECK
   ) {
-    console.log("Real session available. Syncing cached messages...");
-    // forceSyncMessages(rawBufferRef.current);
+    console.log("New session available. Syncing cached messages...");
+    newlyCreatedRef.current = false;  // ADD THIS - prevent repeat fires
     forceSyncMessages(stripEmptyAssistant(rawBufferRef.current));
   }
 }, [currentSession]);
-
 
   const handleAssessmentComplete = (score: number, interpretation: string) => {
     // Update the local state
@@ -3181,7 +3258,6 @@ Let's talk about what you'd like to work on next.`,
     !isLoaded ||
     !user ||
     !isMounted ||
-    isLoadingBotPreferences ||
     isLoadingMessages
   ) {
     return (
