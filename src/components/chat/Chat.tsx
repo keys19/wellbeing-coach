@@ -1586,8 +1586,10 @@ async function loadSessionMessages(sessionId: string) {
   let didLoadFromServer = false;
 
   try {
-    const messagesResponse = await fetch(`/api/sessions/${sessionId}/messages`);
-    const sessionResponse = await fetch(`/api/sessions/${sessionId}`);
+    const [messagesResponse, sessionResponse] = await Promise.all([
+  fetch(`/api/sessions/${sessionId}/messages`),
+  fetch(`/api/sessions/${sessionId}`)
+]);
 
     if (messagesResponse.ok) {
       const messagesData = await messagesResponse.json();
@@ -3256,7 +3258,6 @@ useEffect(() => {
     !isLoaded ||
     !user ||
     !isMounted ||
-    isLoadingBotPreferences ||
     isLoadingMessages
   ) {
     return (
