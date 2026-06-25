@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server"
 import { streamText } from "ai"
-import { openai } from "@ai-sdk/openai"
+import { createOpenAI } from "@ai-sdk/openai"
 import { prisma, withRetry, initDatabase } from "@/lib/db/prisma"
 import {mergeProfiles } from "@/lib/profile-extractor"
 import { auth } from "@clerk/nextjs/server"
@@ -47,6 +47,11 @@ interface UserProfileData {
     updatedAt?: string;
     [key: string]: unknown;
 }
+
+const openRouter = createOpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENAI_API_KEY, // Keeps your current variable name or change to OPENROUTER_API_KEY
+});
 
 // Add JsonValue type definition to handle Prisma's JSON fields
 type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
@@ -1357,7 +1362,7 @@ console.log("PHASE ROUTER:", {
         console.log(`Sending request to AI model`)
         // After getting the AI response, also save any profile data from the new response
         const result = streamText({
-        model: openai("gpt-4.1"),
+        model: openRouter("openai/gpt-4.1"),
         temperature: 0.5,
         maxTokens: 600,
         messages: promptMessages,
