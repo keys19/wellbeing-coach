@@ -86,8 +86,13 @@ Output ONLY JSON (no prose).`
             return null; // graceful fallback so dashboard doesn’t crash
         }
 
+        // const data = await response.json().catch(() => null);
+        // return (data && data.analysis) ? data.analysis : null;
         const data = await response.json().catch(() => null);
-        return (data && data.analysis) ? data.analysis : null;
+            if (!data) return null;
+            if (data.analysis && typeof data.analysis === "object") return data.analysis;
+            if (data.tone) return data; // returned flat, no wrapper
+            return null;
     } catch (error) {
         console.error("Error analyzing communication style:", error);
         return null;
